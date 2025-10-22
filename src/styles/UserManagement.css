@@ -1,0 +1,108 @@
+.user-container {
+  background: linear-gradient(120deg, #0f2027, #203a43, #2c5364);
+  min-height: 100vh;
+  color: #fff;
+  padding: 30px 60px;
+  font-family: "Poppins", sans-serif;
+}
+
+.user-header h2 {
+  font-size: 32px;
+  margin-bottom: 5px;
+  color: #00e6ac;
+}
+
+.user-header p {
+  color: #b3c2ca;
+  margin-bottom: 30px;
+}
+
+.user-form {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 40px;
+}
+
+.user-form input,
+.user-form select {
+  padding: 10px 15px;
+  border-radius: 8px;
+  border: none;
+  flex: 1;
+  font-size: 14px;
+}
+
+.user-form button {
+  background: #00e6ac;
+  border: none;
+  padding: 10px 25px;
+  color: #0f2027;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+.user-form button:hover {
+  background: #00b38f;
+}
+
+.user-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.user-table th,
+.user-table td {
+  padding: 14px;
+  text-align: left;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.user-table th {
+  background: rgba(0, 0, 0, 0.4);
+  color: #00e6ac;
+}
+
+.user-table tr:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.active {
+  color: #00ffcc;
+  font-weight: 600;
+}
+
+.inactive {
+  color: #ff8080;
+  font-weight: 600;
+}
+
+.lock,
+.unlock {
+  background: #00e6ac;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 8px;
+  color: #0f2027;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.lock:hover {
+  background: #ff4d4d;
+  color: white;
+}
+
+.unlock:hover {
+  background: #66ff99;
+  color: #0f2027;
+}

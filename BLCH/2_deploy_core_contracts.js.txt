@@ -1,0 +1,16 @@
+const UserAccess = artifacts.require("UserAccess");
+const AdminPortal = artifacts.require("AdminPortal");
+const SeedTrace = artifacts.require("SeedTrace");
+
+module.exports = async function (deployer) {
+  // Deploy UserAccess first
+  await deployer.deploy(UserAccess);
+  const userAccess = await UserAccess.deployed();
+
+  // Then deploy AdminPortal (assuming it may depend on UserAccess)
+  await deployer.deploy(AdminPortal, userAccess.address);
+  const adminPortal = await AdminPortal.deployed();
+
+  // Then deploy SeedTrace
+  await deployer.deploy(SeedTrace, adminPortal.address);
+};
