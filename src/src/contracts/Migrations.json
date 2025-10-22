@@ -623,7 +623,7 @@
   "sourceMap": "89:389:1:-:0;;;188:51;;;;;;;;;-1:-1:-1;213:5:1;:18;;-1:-1:-1;;;;;;213:18:1;221:10;213:18;;;89:389;;;;;;",
   "deployedSourceMap": "89:389:1:-:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;143:36;;;:::i;:::-;;;;;;;:::i;:::-;;;;;;;;116:20;;;:::i;:::-;;;;;;;:::i;364:111::-;;;;;;:::i;:::-;;:::i;:::-;;143:36;;;;:::o;116:20::-;;;-1:-1:-1;;;;;116:20:1;;:::o;364:111::-;302:5;;-1:-1:-1;;;;;302:5:1;288:10;:19;280:56;;;;-1:-1:-1;;;280:56:1;;;;;;;:::i;:::-;;;;;;;;;431:24:::1;:36:::0;364:111::o;14:190:3:-;;126:2;114:9;105:7;101:23;97:32;94:2;;;147:6;139;132:22;94:2;-1:-1:-1;175:23:3;;84:120;-1:-1:-1;84:120:3:o;209:203::-;-1:-1:-1;;;;;373:32:3;;;;355:51;;343:2;328:18;;310:102::o;417:348::-;619:2;601:21;;;658:2;638:18;;;631:30;697:26;692:2;677:18;;670:54;756:2;741:18;;591:174::o;770:177::-;916:25;;;904:2;889:18;;871:76::o",
   "source": "// SPDX-License-Identifier: MIT(This is the default contract)\r\npragma solidity 0.8.0;\r\n\r\ncontract Migrations {\r\n    address public owner;\r\n    uint public last_completed_migration;\r\n\r\n    constructor() {\r\n        owner = msg.sender;\r\n    }\r\n\r\n    modifier restricted() {\r\n        require(msg.sender == owner, \"Only owner can call this\");\r\n        _;\r\n    }\r\n\r\n    function setCompleted(uint completed) public restricted {\r\n        last_completed_migration = completed;\r\n    }\r\n}\r\n",
-  "sourcePath": "C:\\Users\\admin\\OneDrive - Vidyalankar Institute of Technology\\Desktop\\Saathi\\saathi\\src\\contracts\\Migrations.sol",
+  "sourcePath": "X:\\projects\\Saathi-Seed-Portal\\src\\contracts\\Migrations.sol",
   "ast": {
     "absolutePath": "project:/contracts/Migrations.sol",
     "exportedSymbols": {
@@ -1084,7 +1084,7 @@
     }
   },
   "schemaVersion": "3.4.16",
-  "updatedAt": "2025-10-18T15:21:18.458Z",
+  "updatedAt": "2025-10-22T10:55:47.050Z",
   "devdoc": {
     "kind": "dev",
     "methods": {},

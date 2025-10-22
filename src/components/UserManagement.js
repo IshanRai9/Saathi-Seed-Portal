@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import getWeb3 from "../Utils/web3";
 import AdminPortalContract from "../src/contracts/AdminPortal.json";
 import "../styles/UserManagement.css";
@@ -14,11 +14,7 @@ const UserManagement = () => {
   });
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    loadBlockchain();
-  }, [loadBlockchain]);
-
-  const loadBlockchain = async () => {
+  const loadBlockchain = useCallback(async () => {
     try {
       const web3 = await getWeb3();
       const accounts = await web3.eth.getAccounts();
@@ -41,7 +37,11 @@ const UserManagement = () => {
     } catch (err) {
       console.error("Blockchain load error:", err);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    loadBlockchain();
+  }, [loadBlockchain]);
 
   const fetchUsers = async (instance, acc) => {
     const count = await instance.methods.userList().call();
