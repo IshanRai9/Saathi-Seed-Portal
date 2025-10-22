@@ -1,0 +1,89 @@
+.portal-navigation {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  border-bottom: 2px solid #e0e0e0;
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.nav-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+}
+
+.nav-brand h2 {
+  margin: 0;
+  color: #2c3e50;
+  font-size: 1.5em;
+  font-weight: 600;
+}
+
+.nav-portals {
+  display: flex;
+  gap: 10px;
+}
+
+.nav-portal-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.nav-portal-btn:hover {
+  border-color: #667eea;
+  background: #f8f9ff;
+  transform: translateY(-1px);
+}
+
+.nav-portal-btn.active {
+  border-color: #667eea;
+  background: #667eea;
+  color: white;
+}
+
+.nav-portal-btn.active:hover {
+  background: #5a6fd8;
+}
+
+.portal-icon {
+  font-size: 16px;
+}
+
+.portal-label {
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .nav-container {
+    padding: 10px 15px;
+  }
+  
+  .nav-brand h2 {
+    font-size: 1.3em;
+  }
+  
+  .nav-portal-btn {
+    padding: 8px 15px;
+    font-size: 13px;
+  }
+  
+  .portal-icon {
+    font-size: 14px;
+  }
+}
+

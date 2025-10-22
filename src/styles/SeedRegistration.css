@@ -2,12 +2,14 @@
   margin-left: 260px;
   padding: 40px;
   font-family: "Poppins", sans-serif;
-  background: #f1f8e9;
+  background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
   min-height: 100vh;
+  color: white;
 }
 
 h2 {
-  color: #2e7d32;
+  color: white;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .dashboard {

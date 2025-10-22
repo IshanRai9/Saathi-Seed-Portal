@@ -1,19 +1,18 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Sidebar from "./components/Sidebar";
-import Dashboard from "./components/Dashboard";
-import SeedRegistration from "./components/SeedRegistration";
-import UserManagement from "./components/UserManagement";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import PortalNavigation from "./components/PortalNavigation";
+import AdminPortal from "./Pages/AdminPortal";
+import UserPortal from "./Pages/UserPortal";
 
 const App = () => {
   return (
     <Router>
-      <Sidebar />
-      <div style={{ marginLeft: "70px", padding: "20px" }}>
+      <div className="app">
+        <PortalNavigation />
         <Routes>
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/seed-registration" element={<SeedRegistration />} />
-          <Route path="/user-management" element={<UserManagement />} />
+          <Route path="/" element={<Navigate to="/admin" replace />} />
+          <Route path="/admin/*" element={<AdminPortal />} />
+          <Route path="/user/*" element={<UserPortal />} />
         </Routes>
       </div>
     </Router>

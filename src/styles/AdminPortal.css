@@ -1,16 +1,18 @@
 .admin-portal {
   display: flex;
+  margin-top: 80px;
 }
 
 .admin-content {
   margin-left: 250px;
   padding: 30px;
-  background-color: #f7f9fc;
-  min-height: 100vh;
+  background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+  min-height: calc(100vh - 80px);
   width: 100%;
   transition: all 0.3s ease;
 }
 
 h1, h2 {
-  color: #2c3e50;
+  color: white;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }

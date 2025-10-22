@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import Sidebar from "./Sidebar";
-import Dashboard from "./Dashboard";
-import UserManagement from "./UserManagement";
-import SeedRegistration from "./SeedRegistration";
+import Sidebar from "../components/Sidebar";
+import Dashboard from "../components/Dashboard";
+import UserManagement from "../components/UserManagement";
+import SeedRegistration from "../components/SeedRegistration";
 import "../styles/AdminPortal.css";
 
 const AdminPortal = () => {
