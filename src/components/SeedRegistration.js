@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from "react";
 import getWeb3 from "../Utils/web3";
+import { useAuth } from "../contexts/AuthContext";
+import { getAdminPortal } from "../Utils/web3";
+import { withErrorHandling } from "../Utils/errorHandling";
 import AdminPortal from "../src/contracts/AdminPortal.json";
 import "../styles/SeedRegistration.css";
 
@@ -49,31 +52,53 @@ const SeedRegistration = () => {
   const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
 
+  const { currentUser, walletAddress, userRole } = useAuth();
+  const [registrationError, setRegistrationError] = useState(null);
+  const [registering, setRegistering] = useState(false);
+
   const registerSeed = async () => {
-    const {
-      seedID,
-      cropName,
-      variety,
-      lotNumber,
-      certificationType,
-      tagNumber,
-      quantity,
-      pricePerUnit,
-    } = formData;
-    await contract.methods
-      .addSeed(
-        seedID,
-        cropName,
-        variety,
-        lotNumber,
-        certificationType,
-        tagNumber,
-        quantity,
-        pricePerUnit
-      )
-      .send({ from: account });
-    alert("✅ Seed Registered Successfully!");
-    loadDashboard(contract);
+    // Check if user is authenticated and has admin role
+    if (!currentUser || !walletAddress || !(userRole === 'Admin' || userRole === 'SuperAdmin')) {
+      alert("You don't have permission to register seeds");
+      return;
+    }
+    
+    setRegistering(true);
+    setRegistrationError(null);
+    
+    try {
+      await withErrorHandling(async () => {
+        const {
+          seedID,
+          cropName,
+          variety,
+          lotNumber,
+          certificationType,
+          tagNumber,
+          quantity,
+          pricePerUnit,
+        } = formData;
+        
+        await contract.methods
+          .addSeed(
+            seedID,
+            cropName,
+            variety,
+            lotNumber,
+            certificationType,
+            tagNumber,
+            quantity,
+            pricePerUnit
+          )
+          .send({ from: account });
+        alert("✅ Seed Registered Successfully!");
+        loadDashboard(contract);
+      }, setRegistrationError);
+    } catch (err) {
+      console.log("Registration error handled");
+    } finally {
+      setRegistering(false);
+    }
   };
 
   const searchSeed = async () => {

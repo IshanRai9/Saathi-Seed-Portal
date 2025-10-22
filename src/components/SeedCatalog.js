@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from "react";
+import { useAuth } from "../contexts/AuthContext";
+import { getUserPortal } from "../Utils/web3";
+import { withErrorHandling } from "../Utils/errorHandling";
 import "../styles/SeedCatalog.css";
 
 const SeedCatalog = () => {
@@ -12,9 +15,14 @@ const SeedCatalog = () => {
   });
   const [loading, setLoading] = useState(true);
 
+  const { currentUser, walletAddress } = useAuth();
+  const [catalogError, setCatalogError] = useState(null);
+
   useEffect(() => {
-    loadSeeds();
-  }, []);
+    if (currentUser && walletAddress) {
+      loadSeeds();
+    }
+  }, [currentUser, walletAddress]);
 
   useEffect(() => {
     applyFilters();
@@ -23,66 +31,79 @@ const SeedCatalog = () => {
   const loadSeeds = async () => {
     try {
       setLoading(true);
-      // This would typically load from smart contract
-      // For now, using mock data
-      const mockSeeds = [
-        {
-          id: "SEED-001",
-          name: "Hybrid Corn Seeds",
-          variety: "Golden Harvest",
-          cropType: "Corn",
-          price: 2.50,
-          quantity: 1000,
-          certification: "Organic",
-          description: "High-yield hybrid corn seeds with excellent disease resistance.",
-          image: "🌽"
-        },
-        {
-          id: "SEED-002",
-          name: "Premium Wheat Seeds",
-          variety: "Winter King",
-          cropType: "Wheat",
-          price: 2.00,
-          quantity: 500,
-          certification: "Certified",
-          description: "Premium winter wheat seeds for optimal yield.",
-          image: "🌾"
-        },
-        {
-          id: "SEED-003",
-          name: "Organic Rice Seeds",
-          variety: "Basmati Supreme",
-          cropType: "Rice",
-          price: 3.25,
-          quantity: 300,
-          certification: "Organic",
-          description: "Premium organic basmati rice seeds.",
-          image: "🍚"
-        },
-        {
-          id: "SEED-004",
-          name: "Tomato Seeds",
-          variety: "Cherry Delight",
-          cropType: "Vegetable",
-          price: 1.75,
-          quantity: 800,
-          certification: "Certified",
-          description: "Sweet cherry tomato seeds for home gardens.",
-          image: "🍅"
-        },
-        {
-          id: "SEED-005",
-          name: "Soybean Seeds",
-          variety: "Protein Plus",
-          cropType: "Soybean",
-          price: 2.80,
-          quantity: 600,
-          certification: "Certified",
-          description: "High-protein soybean seeds for commercial farming.",
-          image: "🫘"
+      // Use withErrorHandling to handle blockchain errors
+      await withErrorHandling(async () => {
+        // Try to load data from blockchain
+        const userPortalInstance = await getUserPortal();
+        
+        if (!userPortalInstance) {
+          throw new Error("Failed to load user portal contract");
         }
-      ];
-      setSeeds(mockSeeds);
+        
+        // Clear any previous errors
+        setCatalogError(null);
+        
+        // For now, we'll still use mock data but with proper error handling
+        // In a real implementation, you would fetch this data from the contract
+        const mockSeeds = [
+          {
+            id: "SEED-001",
+            name: "Hybrid Corn Seeds",
+            variety: "Golden Harvest",
+            cropType: "Corn",
+            price: 2.50,
+            quantity: 1000,
+            certification: "Organic",
+            description: "High-yield hybrid corn seeds with excellent disease resistance.",
+            image: "🌽"
+          },
+          {
+            id: "SEED-002",
+            name: "Premium Wheat Seeds",
+            variety: "Winter King",
+            cropType: "Wheat",
+            price: 2.00,
+            quantity: 500,
+            certification: "Certified",
+            description: "Premium winter wheat seeds for optimal yield.",
+            image: "🌾"
+          },
+          {
+            id: "SEED-003",
+            name: "Organic Rice Seeds",
+            variety: "Basmati Supreme",
+            cropType: "Rice",
+            price: 3.25,
+            quantity: 300,
+            certification: "Organic",
+            description: "Premium organic basmati rice seeds.",
+            image: "🍚"
+          },
+          {
+            id: "SEED-004",
+            name: "Tomato Seeds",
+            variety: "Cherry Delight",
+            cropType: "Vegetable",
+            price: 1.75,
+            quantity: 800,
+            certification: "Certified",
+            description: "Sweet cherry tomato seeds for home gardens.",
+            image: "🍅"
+          },
+          {
+            id: "SEED-005",
+            name: "Soybean Seeds",
+            variety: "Protein Plus",
+            cropType: "Soybean",
+            price: 2.80,
+            quantity: 600,
+            certification: "Certified",
+            description: "High-protein soybean seeds for commercial farming.",
+            image: "🫘"
+          }
+        ];
+        setSeeds(mockSeeds);
+      });
     } catch (error) {
       console.error("Error loading seeds:", error);
     } finally {

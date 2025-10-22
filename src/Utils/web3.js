@@ -1,12 +1,13 @@
 import Web3 from "web3";
-import AdminPortalContract from "../src/contracts/AdminPortal.json";
-import UserPortalContract from "../src/contracts/UserPortal.json";
+// Update import paths to match the actual location of contract JSON files
+import AdminPortalContract from "../contracts/build/contracts/AdminPortal.json";
+import UserPortalContract from "../contracts/build/contracts/UserPortal.json";
 
 let web3;
 let adminPortal;
 let userPortal;
 
-const getWeb3 = async () => {
+export const getWeb3 = async () => {
   if (web3) {
     return web3;
   }

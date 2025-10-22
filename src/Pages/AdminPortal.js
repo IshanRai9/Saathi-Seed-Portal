@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 import Sidebar from "../components/Sidebar";
 import Dashboard from "../components/Dashboard";
 import UserManagement from "../components/UserManagement";
@@ -7,6 +9,15 @@ import "../styles/AdminPortal.css";
 
 const AdminPortal = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
+  const { currentUser, userRole, loading } = useAuth();
+  const navigate = useNavigate();
+  
+  // Redirect if not authenticated or not an admin
+  useEffect(() => {
+    if (!loading && (!currentUser || !(userRole === 'Admin' || userRole === 'SuperAdmin'))) {
+      navigate('/login');
+    }
+  }, [currentUser, userRole, loading, navigate]);
 
   const renderContent = () => {
     switch (activeTab) {

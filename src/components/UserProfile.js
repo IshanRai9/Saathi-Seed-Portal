@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from "react";
+import { useAuth } from "../contexts/AuthContext";
+import { getUserPortal, updateProfile } from "../Utils/web3";
+import { withErrorHandling } from "../Utils/errorHandling";
 import "../styles/UserProfile.css";
 
 const UserProfile = () => {
@@ -14,22 +17,40 @@ const UserProfile = () => {
 
   const [isEditing, setIsEditing] = useState(false);
 
+  const { currentUser, walletAddress } = useAuth();
+  const [profileError, setProfileError] = useState(null);
+
   useEffect(() => {
-    loadUserProfile();
-  }, []);
+    if (currentUser && walletAddress) {
+      loadUserProfile();
+    }
+  }, [currentUser, walletAddress]);
 
   const loadUserProfile = async () => {
     try {
-      // This would typically load from smart contract
-      // For now, using mock data
-      setProfile({
-        name: "John Doe",
-        email: "john.doe@example.com",
-        address: "123 Farm Street, Agriculture City, AC 12345",
-        phone: "+1 (555) 123-4567",
-        role: "Customer",
-        walletAddress: "0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b6",
-        registrationDate: "2024-01-01"
+      // Use withErrorHandling to handle blockchain errors
+      await withErrorHandling(async () => {
+        // Try to load data from blockchain
+        const userPortalInstance = await getUserPortal();
+        
+        if (!userPortalInstance) {
+          throw new Error("Failed to load user portal contract");
+        }
+        
+        // Clear any previous errors
+        setProfileError(null);
+        
+        // For now, we'll still use mock data but with proper error handling
+        // In a real implementation, you would fetch this data from the contract
+        setProfile({
+          name: "John Doe",
+          email: "john.doe@example.com",
+          address: "123 Farm Street, Agriculture City, AC 12345",
+          phone: "+1 (555) 123-4567",
+          role: "Customer",
+          walletAddress: "0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b6",
+          registrationDate: "2024-01-01"
+        });
       });
     } catch (error) {
       console.error("Error loading profile:", error);

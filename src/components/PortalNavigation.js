@@ -1,10 +1,12 @@
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 import "../styles/PortalNavigation.css";
 
 const PortalNavigation = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { currentUser, userRole, logout } = useAuth();
 
   const isAdminPortal = location.pathname.startsWith('/admin');
   const isUserPortal = location.pathname.startsWith('/user');
@@ -17,6 +19,11 @@ const PortalNavigation = () => {
     }
   };
 
+  // Don't render navigation if user is not logged in
+  if (!currentUser) {
+    return null;
+  }
+
   return (
     <div className="portal-navigation">
       <div className="nav-container">
@@ -25,13 +32,16 @@ const PortalNavigation = () => {
         </div>
         
         <div className="nav-portals">
-          <button
-            className={`nav-portal-btn ${isAdminPortal ? 'active' : ''}`}
-            onClick={() => handlePortalSwitch('admin')}
-          >
-            <span className="portal-icon">👨‍💼</span>
-            <span className="portal-label">Admin Portal</span>
-          </button>
+          {/* Only show Admin Portal button if user has admin role */}
+          {(userRole === 'Admin' || userRole === 'SuperAdmin') && (
+            <button
+              className={`nav-portal-btn ${isAdminPortal ? 'active' : ''}`}
+              onClick={() => handlePortalSwitch('admin')}
+            >
+              <span className="portal-icon">👨‍💼</span>
+              <span className="portal-label">Admin Portal</span>
+            </button>
+          )}
           
           <button
             className={`nav-portal-btn ${isUserPortal ? 'active' : ''}`}
@@ -39,6 +49,17 @@ const PortalNavigation = () => {
           >
             <span className="portal-icon">👤</span>
             <span className="portal-label">User Portal</span>
+          </button>
+
+          <button
+            className="nav-portal-btn logout-button"
+            onClick={() => {
+              logout();
+              navigate("/login");
+            }}
+          >
+            <span className="portal-icon">🚪</span>
+            <span className="portal-label">Logout</span>
           </button>
         </div>
       </div>

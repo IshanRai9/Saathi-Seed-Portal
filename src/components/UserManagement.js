@@ -1,9 +1,13 @@
 import React, { useEffect, useState, useCallback } from "react";
+import { useAuth } from "../contexts/AuthContext";
 import getWeb3 from "../Utils/web3";
+import { getAdminPortal } from "../Utils/web3";
+import { withErrorHandling } from "../Utils/errorHandling";
 import AdminPortalContract from "../src/contracts/AdminPortal.json";
 import "../styles/UserManagement.css";
 
 const UserManagement = () => {
+  const { currentUser, walletAddress, userRole } = useAuth();
   const [account, setAccount] = useState("");
   const [contract, setContract] = useState(null);
   const [users, setUsers] = useState([]);
@@ -13,35 +17,43 @@ const UserManagement = () => {
     role: 1,
   });
   const [loading, setLoading] = useState(false);
+  const [managementError, setManagementError] = useState(null);
 
   const loadBlockchain = useCallback(async () => {
     try {
-      const web3 = await getWeb3();
-      const accounts = await web3.eth.getAccounts();
-      setAccount(accounts[0]);
+      await withErrorHandling(async () => {
+        const web3 = await getWeb3();
+        const accounts = await web3.eth.getAccounts();
+        setAccount(accounts[0]);
 
-      const networkId = await web3.eth.net.getId();
-      const networkData = AdminPortalContract.networks[networkId];
-      if (!networkData) {
-        alert("Smart contract not deployed to the connected network");
-        return;
-      }
+        const networkId = await web3.eth.net.getId();
+        const networkData = AdminPortalContract.networks[networkId];
+        if (!networkData) {
+          setManagementError("Smart contract not deployed to the connected network");
+          return;
+        }
 
-      const instance = new web3.eth.Contract(
-        AdminPortalContract.abi,
-        networkData.address
-      );
-      setContract(instance);
+        const instance = new web3.eth.Contract(
+          AdminPortalContract.abi,
+          networkData.address
+        );
+        setContract(instance);
 
-      await fetchUsers(instance, accounts[0]);
+        await fetchUsers(instance, accounts[0]);
+        setManagementError(null);
+      });
     } catch (err) {
       console.error("Blockchain load error:", err);
+      setManagementError(err.message || "Failed to load blockchain data");
     }
   }, []);
 
   useEffect(() => {
-    loadBlockchain();
-  }, [loadBlockchain]);
+    // Only load blockchain if user is authenticated and has appropriate role
+    if (currentUser && walletAddress && (userRole === 'Admin' || userRole === 'SuperAdmin')) {
+      loadBlockchain();
+    }
+  }, [loadBlockchain, currentUser, walletAddress, userRole]);
 
   const fetchUsers = async (instance, acc) => {
     const count = await instance.methods.userList().call();

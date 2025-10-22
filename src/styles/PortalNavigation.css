@@ -50,6 +50,17 @@
   transform: translateY(-1px);
 }
 
+.logout-button {
+  margin-left: auto;
+  background-color: #f5f5f5;
+  border: 1px solid #e0e0e0;
+}
+
+.logout-button:hover {
+  background-color: #e57373;
+  color: white;
+}
+
 .nav-portal-btn.active {
   border-color: #667eea;
   background: #667eea;

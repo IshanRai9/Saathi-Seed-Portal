@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from "react";
+import { useAuth } from "../contexts/AuthContext";
+import { getUserPortal } from "../Utils/web3";
+import { withErrorHandling } from "../Utils/errorHandling";
 import "../styles/UserDashboard.css";
 
 const UserDashboard = () => {
@@ -12,59 +15,77 @@ const UserDashboard = () => {
   const [recentPurchases, setRecentPurchases] = useState([]);
   const [availableSeeds, setAvailableSeeds] = useState([]);
 
+  const { currentUser, walletAddress } = useAuth();
+  const [dashboardError, setDashboardError] = useState(null);
+
   useEffect(() => {
-    // Load user dashboard data
-    loadUserData();
-  }, []);
+    // Load user dashboard data when user is authenticated
+    if (currentUser && walletAddress) {
+      loadUserData();
+    }
+  }, [currentUser, walletAddress]);
 
   const loadUserData = async () => {
     try {
-      // This would typically load from smart contract
-      // For now, using mock data
-      setUserStats({
-        totalPurchases: 12,
-        totalSpent: 2450.50,
-        favoriteCrop: "Wheat",
-        lastPurchase: "2024-01-15"
+      // Use withErrorHandling to handle blockchain errors
+      await withErrorHandling(async () => {
+        // Try to load data from blockchain
+        const userPortalInstance = await getUserPortal();
+        
+        if (!userPortalInstance) {
+          throw new Error("Failed to load user portal contract");
+        }
+        
+        // Clear any previous errors
+        setDashboardError(null);
+        
+        // For now, we'll still use mock data but with proper error handling
+        // In a real implementation, you would fetch this data from the contract
+        setUserStats({
+          totalPurchases: 12,
+          totalSpent: 2450.50,
+          favoriteCrop: "Wheat",
+          lastPurchase: "2024-01-15"
+        });
+
+        setRecentPurchases([
+          {
+            id: "PUR-001",
+            seedName: "Premium Wheat Seeds",
+            quantity: 50,
+            price: 125.00,
+            date: "2024-01-15",
+            status: "Delivered"
+          },
+          {
+            id: "PUR-002", 
+            seedName: "Organic Rice Seeds",
+            quantity: 30,
+            price: 89.50,
+            date: "2024-01-10",
+            status: "In Transit"
+          }
+        ]);
+
+        setAvailableSeeds([
+          {
+            id: "SEED-001",
+            name: "Hybrid Corn Seeds",
+            variety: "Golden Harvest",
+            price: 2.50,
+            quantity: 1000,
+            certification: "Organic"
+          },
+          {
+            id: "SEED-002",
+            name: "Premium Wheat Seeds", 
+            variety: "Winter King",
+            price: 2.00,
+            quantity: 500,
+            certification: "Certified"
+          }
+        ]);
       });
-
-      setRecentPurchases([
-        {
-          id: "PUR-001",
-          seedName: "Premium Wheat Seeds",
-          quantity: 50,
-          price: 125.00,
-          date: "2024-01-15",
-          status: "Delivered"
-        },
-        {
-          id: "PUR-002", 
-          seedName: "Organic Rice Seeds",
-          quantity: 30,
-          price: 89.50,
-          date: "2024-01-10",
-          status: "In Transit"
-        }
-      ]);
-
-      setAvailableSeeds([
-        {
-          id: "SEED-001",
-          name: "Hybrid Corn Seeds",
-          variety: "Golden Harvest",
-          price: 2.50,
-          quantity: 1000,
-          certification: "Organic"
-        },
-        {
-          id: "SEED-002",
-          name: "Premium Wheat Seeds", 
-          variety: "Winter King",
-          price: 2.00,
-          quantity: 500,
-          certification: "Certified"
-        }
-      ]);
     } catch (error) {
       console.error("Error loading user data:", error);
     }

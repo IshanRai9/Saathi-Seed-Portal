@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from "react";
+import { useAuth } from "../contexts/AuthContext";
+import { getUserPortal } from "../Utils/web3";
+import { withErrorHandling } from "../Utils/errorHandling";
 import "../styles/PurchaseHistory.css";
 
 const PurchaseHistory = () => {
@@ -11,9 +14,14 @@ const PurchaseHistory = () => {
   });
   const [loading, setLoading] = useState(true);
 
+  const { currentUser, walletAddress } = useAuth();
+  const [purchaseError, setPurchaseError] = useState(null);
+
   useEffect(() => {
-    loadPurchaseHistory();
-  }, []);
+    if (currentUser && walletAddress) {
+      loadPurchaseHistory();
+    }
+  }, [currentUser, walletAddress]);
 
   useEffect(() => {
     applyFilters();
@@ -22,71 +30,84 @@ const PurchaseHistory = () => {
   const loadPurchaseHistory = async () => {
     try {
       setLoading(true);
-      // This would typically load from smart contract
-      // For now, using mock data
-      const mockPurchases = [
-        {
-          id: "PUR-001",
-          seedName: "Premium Wheat Seeds",
-          variety: "Winter King",
-          quantity: 50,
-          unitPrice: 2.00,
-          totalPrice: 100.00,
-          date: "2024-01-15",
-          status: "Delivered",
-          trackingNumber: "TRK-123456",
-          seedId: "SEED-002"
-        },
-        {
-          id: "PUR-002",
-          seedName: "Organic Rice Seeds",
-          variety: "Basmati Supreme",
-          quantity: 30,
-          unitPrice: 3.25,
-          totalPrice: 97.50,
-          date: "2024-01-10",
-          status: "In Transit",
-          trackingNumber: "TRK-123457",
-          seedId: "SEED-003"
-        },
-        {
-          id: "PUR-003",
-          seedName: "Hybrid Corn Seeds",
-          variety: "Golden Harvest",
-          quantity: 25,
-          unitPrice: 2.50,
-          totalPrice: 62.50,
-          date: "2024-01-05",
-          status: "Delivered",
-          trackingNumber: "TRK-123458",
-          seedId: "SEED-001"
-        },
-        {
-          id: "PUR-004",
-          seedName: "Tomato Seeds",
-          variety: "Cherry Delight",
-          quantity: 100,
-          unitPrice: 1.75,
-          totalPrice: 175.00,
-          date: "2023-12-28",
-          status: "Cancelled",
-          trackingNumber: null,
-          seedId: "SEED-004"
-        },
-        {
-          id: "PUR-005",
-          seedName: "Soybean Seeds",
-          variety: "Protein Plus",
-          quantity: 40,
-          unitPrice: 2.80,
-          totalPrice: 112.00,
-          date: "2023-12-20",
-          status: "Delivered",
-          trackingNumber: "TRK-123459",
-          seedId: "SEED-005"
+      // Use withErrorHandling to handle blockchain errors
+      await withErrorHandling(async () => {
+        // Try to load data from blockchain
+        const userPortalInstance = await getUserPortal();
+        
+        if (!userPortalInstance) {
+          throw new Error("Failed to load user portal contract");
         }
-      ];
-      setPurchases(mockPurchases);
+        
+        // Clear any previous errors
+        setPurchaseError(null);
+        
+        // For now, we'll still use mock data but with proper error handling
+        // In a real implementation, you would fetch this data from the contract
+        const mockPurchases = [
+          {
+            id: "PUR-001",
+            seedName: "Premium Wheat Seeds",
+            variety: "Winter King",
+            quantity: 50,
+            unitPrice: 2.00,
+            totalPrice: 100.00,
+            date: "2024-01-15",
+            status: "Delivered",
+            trackingNumber: "TRK-123456",
+            seedId: "SEED-002"
+          },
+          {
+            id: "PUR-002",
+            seedName: "Organic Rice Seeds",
+            variety: "Basmati Supreme",
+            quantity: 30,
+            unitPrice: 3.25,
+            totalPrice: 97.50,
+            date: "2024-01-10",
+            status: "In Transit",
+            trackingNumber: "TRK-123457",
+            seedId: "SEED-003"
+          },
+          {
+            id: "PUR-003",
+            seedName: "Hybrid Corn Seeds",
+            variety: "Golden Harvest",
+            quantity: 25,
+            unitPrice: 2.50,
+            totalPrice: 62.50,
+            date: "2024-01-05",
+            status: "Delivered",
+            trackingNumber: "TRK-123458",
+            seedId: "SEED-001"
+          },
+          {
+            id: "PUR-004",
+            seedName: "Tomato Seeds",
+            variety: "Cherry Delight",
+            quantity: 100,
+            unitPrice: 1.75,
+            totalPrice: 175.00,
+            date: "2023-12-28",
+            status: "Cancelled",
+            trackingNumber: null,
+            seedId: "SEED-004"
+          },
+          {
+            id: "PUR-005",
+            seedName: "Soybean Seeds",
+            variety: "Protein Plus",
+            quantity: 40,
+            unitPrice: 2.80,
+            totalPrice: 112.00,
+            date: "2023-12-20",
+            status: "Delivered",
+            trackingNumber: "TRK-123459",
+            seedId: "SEED-005"
+          }
+        ];
+        setPurchases(mockPurchases);
+      });
     } catch (error) {
       console.error("Error loading purchase history:", error);
     } finally {

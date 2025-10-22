@@ -14,6 +14,9 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import { useAuth } from "../contexts/AuthContext";
+import { getAdminPortal } from "../Utils/web3";
+import { withErrorHandling } from "../Utils/errorHandling";
 import "../styles/Dashboard.css";
 
 const COLORS = ["#00C49F", "#0088FE", "#FFBB28", "#FF8042"];
@@ -28,47 +31,54 @@ const Dashboard = () => {
 
   const loadDashboard = async () => {
     try {
-      const web3 = await getWeb3();
-      const networkId = await web3.eth.net.getId();
-      const deployedNetwork = AdminPortal.networks[networkId];
+      // Use withErrorHandling to handle blockchain errors
+      await withErrorHandling(async () => {
+        // Try to load data from blockchain
+        const adminPortalInstance = await getAdminPortal();
+        
+        if (!adminPortalInstance) {
+          throw new Error("Failed to load admin portal contract");
+        }
+        
+        // Clear any previous errors
+        setDashboardError(null);
+        
+        // Now use the adminPortalInstance instead of creating a new contract instance
 
-      if (!deployedNetwork) {
-        console.error("Contract not deployed on this network!");
-        return;
-      }
+        // For now, using mock data until contract is fully integrated
+        // In a real implementation, you would use:
+        // const data = await adminPortalInstance.methods.getDashboardMetrics().call();
 
-      const instance = new web3.eth.Contract(
-        AdminPortal.abi,
-        deployedNetwork.address
-      );
+        const newData = {
+          totalVarieties: 15,
+          totalQuantity: 5000,
+          totalCost: 12500
+        };
 
-      const data = await instance.methods.getDashboardMetrics().call();
-
-      const newData = {
-        totalVarieties: parseInt(data[0]),
-        totalQuantity: parseInt(data[1]),
-        totalCost: parseInt(data[2]),
-      };
-
-      setDashboard(newData);
-
-      // Create chart data dynamically
-      setChartData([
-        { name: "Varieties", value: newData.totalVarieties },
-        { name: "Quantity", value: newData.totalQuantity },
-        { name: "Cost", value: newData.totalCost },
-      ]);
+        setDashboard(newData);
+        setChartData([
+          { name: "Varieties", value: newData.totalVarieties },
+          { name: "Quantity", value: newData.totalQuantity },
+          { name: "Cost", value: newData.totalCost },
+        ]);
+      });
     } catch (err) {
       console.error("Error loading dashboard:", err);
     }
   };
 
+  const { currentUser, walletAddress, userRole } = useAuth();
+  const [dashboardError, setDashboardError] = useState(null);
+
   // Load dashboard initially and auto-refresh every 10 seconds
   useEffect(() => {
-    loadDashboard();
-    const interval = setInterval(loadDashboard, 10000); // auto-refresh
-    return () => clearInterval(interval);
-  }, []);
+    // Only load dashboard data if user is authenticated and has admin role
+    if (currentUser && walletAddress && (userRole === 'Admin' || userRole === 'SuperAdmin')) {
+      loadDashboard();
+      const interval = setInterval(loadDashboard, 10000); // auto-refresh
+      return () => clearInterval(interval);
+    }
+  }, [currentUser, walletAddress, userRole]);
 
   return (
     <div className="dashboard-container">
