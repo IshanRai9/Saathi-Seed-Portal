@@ -8,6 +8,7 @@ const Login = () => {
   const { currentUser, connectWallet, loading, error, userRole } = useAuth();
   const [connecting, setConnecting] = useState(false);
   const [loginError, setLoginError] = useState(null);
+  const [selectedRole, setSelectedRole] = useState('user');
   const navigate = useNavigate();
 
   // Redirect if already logged in
@@ -29,7 +30,7 @@ const Login = () => {
     try {
       await withErrorHandling(
         async () => {
-          const success = await connectWallet();
+          const success = await connectWallet(selectedRole);
           if (!success) {
             setLoginError('Failed to connect wallet. Please try again.');
           }
@@ -42,6 +43,10 @@ const Login = () => {
     } finally {
       setConnecting(false);
     }
+  };
+  
+  const handleRoleChange = (event) => {
+    setSelectedRole(event.target.value);
   };
 
   return (
@@ -65,12 +70,38 @@ const Login = () => {
             </div>
           )}
           
+          <div className="role-selection">
+            <p>Select your role:</p>
+            <div className="role-options">
+              <label className="role-option">
+                <input
+                  type="radio"
+                  name="role"
+                  value="user"
+                  checked={selectedRole === 'user'}
+                  onChange={handleRoleChange}
+                />
+                <span>User</span>
+              </label>
+              <label className="role-option">
+                <input
+                  type="radio"
+                  name="role"
+                  value="admin"
+                  checked={selectedRole === 'admin'}
+                  onChange={handleRoleChange}
+                />
+                <span>Admin</span>
+              </label>
+            </div>
+          </div>
+          
           <button 
             className="connect-wallet-btn" 
             onClick={handleConnectWallet}
             disabled={connecting || loading}
           >
-            {connecting ? 'Connecting...' : 'Connect Wallet'}
+            {connecting ? 'Connecting...' : `Connect as ${selectedRole === 'admin' ? 'Admin' : 'User'}`}
           </button>
           
           <div className="login-info">

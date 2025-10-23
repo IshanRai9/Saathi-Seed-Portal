@@ -3,7 +3,7 @@ import { useAuth } from "../contexts/AuthContext";
 import getWeb3 from "../Utils/web3";
 import { getAdminPortal } from "../Utils/web3";
 import { withErrorHandling } from "../Utils/errorHandling";
-import AdminPortalContract from "../src/contracts/AdminPortal.json";
+import AdminPortalContract from "../contracts/build/contracts/AdminPortal.json";
 import "../styles/UserManagement.css";
 
 const UserManagement = () => {
@@ -56,19 +56,24 @@ const UserManagement = () => {
   }, [loadBlockchain, currentUser, walletAddress, userRole]);
 
   const fetchUsers = async (instance, acc) => {
-    const count = await instance.methods.userList().call();
-    const userData = [];
-    for (let i = 0; i < count.length; i++) {
-      const userAddr = count[i];
-      const u = await instance.methods.users(userAddr).call();
-      userData.push({
-        address: userAddr,
-        name: u.name,
-        role: parseInt(u.role),
-        isActive: u.isActive,
-      });
+    try {
+      const userAddresses = await instance.methods.userList().call();
+      const fetchedUsers = [];
+      for (let i = 0; i < userAddresses.length; i++) {
+        const userAddr = userAddresses[i];
+        const u = await instance.methods.users(userAddr).call();
+        fetchedUsers.push({
+          address: userAddr,
+          name: u.name,
+          role: parseInt(u.role),
+          isActive: u.isActive,
+        });
+      }
+      setUsers(fetchedUsers);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      setManagementError("Failed to fetch users. Check console for details.");
     }
-    setUsers(userData);
   };
 
   const addUser = async () => {

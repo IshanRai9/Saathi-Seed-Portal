@@ -3,7 +3,7 @@ import getWeb3 from "../Utils/web3";
 import { useAuth } from "../contexts/AuthContext";
 import { getAdminPortal } from "../Utils/web3";
 import { withErrorHandling } from "../Utils/errorHandling";
-import AdminPortal from "../src/contracts/AdminPortal.json";
+import AdminPortal from "../contracts/build/contracts/AdminPortal.json";
 import "../styles/SeedRegistration.css";
 
 const SeedRegistration = () => {
@@ -103,10 +103,20 @@ const SeedRegistration = () => {
 
   const searchSeed = async () => {
     try {
-      const seed = await contract.methods.searchSeed(searchID).call();
-      setSearchResult(seed);
-    } catch {
-      alert("❌ Seed not found!");
+      // Get all seeds and filter by ID
+      const allSeeds = await contract.methods.getAllSeeds().call();
+      const seed = allSeeds.find(s => s.seedId === searchID);
+      
+      if (seed) {
+        setSearchResult(seed);
+      } else {
+        alert("❌ Seed not found!");
+        setSearchResult(null);
+      }
+    } catch (error) {
+      console.error("Error searching seed:", error);
+      alert("❌ Error searching seed!");
+      setSearchResult(null);
     }
   };
 

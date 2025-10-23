@@ -91,3 +91,41 @@
   line-height: 1.6;
   margin-bottom: 15px;
 }
+
+/* Role selection styles */
+.role-selection {
+  margin-bottom: 20px;
+}
+
+.role-selection p {
+  margin-bottom: 10px;
+  font-weight: 500;
+  color: #333;
+}
+
+.role-options {
+  display: flex;
+  gap: 15px;
+}
+
+.role-option {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 10px 15px;
+  border: 1px solid #e0e0e0;
+  border-radius: 5px;
+  transition: all 0.2s ease;
+}
+
+.role-option:hover {
+  background-color: #f5f5f5;
+}
+
+.role-option input {
+  margin-right: 8px;
+}
+
+.role-option span {
+  font-weight: 500;
+}

@@ -74,7 +74,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   // Connect wallet function
-  const connectWallet = async () => {
+  const connectWallet = async (role = 'user') => {
     try {
       setLoading(true);
       const web3 = await getWeb3();
@@ -87,6 +87,14 @@ export const AuthProvider = ({ children }) => {
         setCurrentUser({
           address: accounts[0],
         });
+        
+        // Set user role based on selection
+        if (role === 'admin') {
+          setUserRole('Admin');
+        } else {
+          setUserRole('Customer');
+        }
+        
         return true;
       }
       return false;
