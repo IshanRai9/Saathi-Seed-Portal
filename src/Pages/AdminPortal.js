@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { useNavigate, Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import Sidebar from "../components/Sidebar";
 import Dashboard from "../components/Dashboard";
@@ -8,7 +8,6 @@ import SeedRegistration from "../components/SeedRegistration";
 import "../styles/AdminPortal.css";
 
 const AdminPortal = () => {
-  const [activeTab, setActiveTab] = useState("dashboard");
   const { currentUser, userRole, loading } = useAuth();
   const navigate = useNavigate();
   
@@ -19,21 +18,17 @@ const AdminPortal = () => {
     }
   }, [currentUser, userRole, loading, navigate]);
 
-  const renderContent = () => {
-    switch (activeTab) {
-      case "users":
-        return <UserManagement />;
-      case "seeds":
-        return <SeedRegistration />;
-      default:
-        return <Dashboard />;
-    }
-  };
-
   return (
     <div className="admin-portal">
-      <Sidebar setActiveTab={setActiveTab} activeTab={activeTab} />
-      <div className="admin-content">{renderContent()}</div>
+      <Sidebar />
+      <div className="admin-content">
+        <Routes>
+          <Route path="/" element={<Navigate to="dashboard" replace />} />
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="seed-registration" element={<SeedRegistration />} />
+          <Route path="user-management" element={<UserManagement />} />
+        </Routes>
+      </div>
     </div>
   );
 };

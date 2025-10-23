@@ -12,7 +12,7 @@ const Sidebar = () => {
       <ul className="sidebar-menu">
         <li>
           <NavLink
-            to="/dashboard"
+            to="/admin/dashboard"
             className={({ isActive }) => (isActive ? "active-link" : "")}
           >
             <FaChartPie className="sidebar-icon" />
@@ -21,7 +21,7 @@ const Sidebar = () => {
         </li>
         <li>
           <NavLink
-            to="/seed-registration"
+            to="/admin/seed-registration"
             className={({ isActive }) => (isActive ? "active-link" : "")}
           >
             <FaSeedling className="sidebar-icon" />
@@ -30,7 +30,7 @@ const Sidebar = () => {
         </li>
         <li>
           <NavLink
-            to="/user-management"
+            to="/admin/user-management"
             className={({ isActive }) => (isActive ? "active-link" : "")}
           >
             <FaUsersCog className="sidebar-icon" />
