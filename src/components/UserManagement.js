@@ -22,26 +22,45 @@ const UserManagement = () => {
   const loadBlockchain = useCallback(async () => {
     try {
       await withErrorHandling(async () => {
+        console.log("Loading blockchain data...");
         const web3 = await getWeb3();
         const accounts = await web3.eth.getAccounts();
+        
+        if (!accounts || accounts.length === 0) {
+          throw new Error("No accounts found. Please connect your wallet.");
+        }
+        
         setAccount(accounts[0]);
+        console.log("Connected account:", accounts[0]);
 
         const networkId = await web3.eth.net.getId();
+        console.log("Network ID:", networkId);
+        
         const networkData = AdminPortalContract.networks[networkId];
         if (!networkData) {
-          setManagementError("Smart contract not deployed to the connected network");
-          return;
+          throw new Error(`Smart contract not deployed to network ${networkId}. Please switch to the correct network.`);
         }
 
+        console.log("Contract address:", networkData.address);
+        
         const instance = new web3.eth.Contract(
           AdminPortalContract.abi,
           networkData.address
         );
         setContract(instance);
 
+        // Test contract connection
+        try {
+          const testCall = await instance.methods.userList().call();
+          console.log("Contract connection successful, user count:", testCall.length);
+        } catch (testError) {
+          console.error("Contract test call failed:", testError);
+          throw new Error("Contract connection failed. Please check if the contract is deployed correctly.");
+        }
+
         await fetchUsers(instance, accounts[0]);
         setManagementError(null);
-      });
+      }, setManagementError);
     } catch (err) {
       console.error("Blockchain load error:", err);
       setManagementError(err.message || "Failed to load blockchain data");
@@ -57,38 +76,98 @@ const UserManagement = () => {
 
   const fetchUsers = async (instance, acc) => {
     try {
+      console.log("Fetching users...");
       const userAddresses = await instance.methods.userList().call();
+      console.log("User addresses found:", userAddresses.length);
+      
       const fetchedUsers = [];
       for (let i = 0; i < userAddresses.length; i++) {
         const userAddr = userAddresses[i];
-        const u = await instance.methods.users(userAddr).call();
-        fetchedUsers.push({
-          address: userAddr,
-          name: u.name,
-          role: parseInt(u.role),
-          isActive: u.isActive,
-        });
+        try {
+          const u = await instance.methods.users(userAddr).call();
+          fetchedUsers.push({
+            address: userAddr,
+            name: u.name,
+            role: parseInt(u.role),
+            isActive: u.isActive,
+          });
+        } catch (userError) {
+          console.error(`Error fetching user ${userAddr}:`, userError);
+          // Continue with other users even if one fails
+        }
       }
       setUsers(fetchedUsers);
+      console.log("Users loaded successfully:", fetchedUsers.length);
     } catch (error) {
       console.error("Error fetching users:", error);
-      setManagementError("Failed to fetch users. Check console for details.");
+      setManagementError(`Failed to fetch users: ${error.message}`);
     }
   };
 
   const addUser = async () => {
-    if (!newUser.address || !newUser.name) return alert("Fill all fields");
+    if (!newUser.address || !newUser.name) {
+      setManagementError("Please fill all fields");
+      return;
+    }
+
+    if (!contract) {
+      setManagementError("Smart contract not loaded. Please refresh the page.");
+      return;
+    }
+
+    if (!account) {
+      setManagementError("Wallet not connected. Please connect your wallet.");
+      return;
+    }
+
     setLoading(true);
+    setManagementError(null);
+
     try {
-      await contract.methods
-        .addUser(newUser.address, newUser.name, newUser.role)
-        .send({ from: account });
-      alert("✅ User added successfully");
-      setNewUser({ address: "", name: "", role: 1 });
-      await fetchUsers(contract, account);
+      await withErrorHandling(async () => {
+        // Validate Ethereum address format
+        const web3 = await getWeb3();
+        if (!web3.utils.isAddress(newUser.address)) {
+          throw new Error("Invalid Ethereum address format");
+        }
+
+        // Check if user already exists
+        try {
+          const existingUser = await contract.methods.users(newUser.address).call();
+          if (existingUser.name && existingUser.name !== "") {
+            throw new Error("User with this address already exists");
+          }
+        } catch (checkError) {
+          // If the call fails, it might mean the user doesn't exist, which is fine
+          console.log("User check result:", checkError.message);
+        }
+
+        // Estimate gas before sending transaction
+        const gasEstimate = await contract.methods
+          .addUser(newUser.address, newUser.name, parseInt(newUser.role))
+          .estimateGas({ from: account });
+
+        console.log("Gas estimate:", gasEstimate);
+
+        // Send transaction with estimated gas + buffer
+        const result = await contract.methods
+          .addUser(newUser.address, newUser.name, parseInt(newUser.role))
+          .send({ 
+            from: account,
+            gas: Math.floor(gasEstimate * 1.2) // Add 20% buffer
+          });
+
+        console.log("Transaction result:", result);
+        
+        setManagementError(null);
+        alert("✅ User added successfully");
+        setNewUser({ address: "", name: "", role: 1 });
+        await fetchUsers(contract, account);
+      }, setManagementError);
     } catch (err) {
-      console.error(err);
-      alert("❌ Failed to add user");
+      console.error("Add user error:", err);
+      const errorMessage = err.message || "Failed to add user";
+      setManagementError(`Failed to add user: ${errorMessage}`);
     }
     setLoading(false);
   };
@@ -116,6 +195,19 @@ const UserManagement = () => {
       <div className="user-header">
         <h2>👥 User Management</h2>
         <p>Manage users, roles, and activation status.</p>
+        {managementError && (
+          <div className="error-message">
+            <p>❌ {managementError}</p>
+          </div>
+        )}
+        
+        {/* Debug Information */}
+        <div className="debug-info">
+          <p><strong>Status:</strong> {contract ? "✅ Contract Connected" : "❌ Contract Not Connected"}</p>
+          <p><strong>Account:</strong> {account || "Not Connected"}</p>
+          <p><strong>User Role:</strong> {userRole || "Unknown"}</p>
+          <p><strong>Users Loaded:</strong> {users.length}</p>
+        </div>
       </div>
 
       <div className="user-form">
@@ -142,6 +234,9 @@ const UserManagement = () => {
         </select>
         <button onClick={addUser} disabled={loading}>
           {loading ? "Adding..." : "Add User"}
+        </button>
+        <button onClick={() => loadBlockchain()} disabled={loading}>
+          🔄 Reload Contract
         </button>
       </div>
 

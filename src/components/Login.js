@@ -13,7 +13,7 @@ const Login = () => {
 
   // Redirect if already logged in
   useEffect(() => {
-    if (currentUser) {
+    if (currentUser && userRole && !loading) {
       // Redirect based on user role
       if (userRole === 'Admin' || userRole === 'SuperAdmin') {
         navigate('/admin');
@@ -21,7 +21,7 @@ const Login = () => {
         navigate('/user');
       }
     }
-  }, [currentUser, userRole, navigate]);
+  }, [currentUser, userRole, loading, navigate]);
 
   const handleConnectWallet = async () => {
     setConnecting(true);

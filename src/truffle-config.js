@@ -3,14 +3,14 @@
 
 module.exports = {
   // Directory where your compiled contract JSON files will be stored
-  contracts_build_directory: "./src/contracts",
+  contracts_build_directory: "./contracts/build/contracts",
 
   networks: {
     // ✅ Local Ganache Network
     development: {
       host: "127.0.0.1",   // Localhost (default: Ganache)
       port: 7545,          // Port number used by Ganache
-      network_id: "5777",  // Match any network (Ganache default)
+      network_id: "5777",  // Match your Ganache network ID
     },
   },
 

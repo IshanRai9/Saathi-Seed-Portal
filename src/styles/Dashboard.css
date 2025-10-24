@@ -1,8 +1,9 @@
 .dashboard-container {
+  margin-left: 70px;
   padding: 20px;
   color: #fff;
   background: linear-gradient(135deg, #1e3c72, #2a5298);
-  min-height: 100vh;
+  min-height: calc(100vh - 80px);
   transition: all 0.3s ease;
 }
 

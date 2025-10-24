@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { useNavigate, Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import UserSidebar from "../components/UserSidebar";
 import UserProfile from "../components/UserProfile";
@@ -9,7 +9,6 @@ import UserDashboard from "../components/UserDashboard";
 import "../styles/UserPortal.css";
 
 const UserPortal = () => {
-  const [activeTab, setActiveTab] = useState("dashboard");
   const { currentUser, loading } = useAuth();
   const navigate = useNavigate();
   
@@ -20,23 +19,18 @@ const UserPortal = () => {
     }
   }, [currentUser, loading, navigate]);
 
-  const renderContent = () => {
-    switch (activeTab) {
-      case "profile":
-        return <UserProfile />;
-      case "catalog":
-        return <SeedCatalog />;
-      case "purchases":
-        return <PurchaseHistory />;
-      default:
-        return <UserDashboard />;
-    }
-  };
-
   return (
     <div className="user-portal">
-      <UserSidebar setActiveTab={setActiveTab} activeTab={activeTab} />
-      <div className="user-content">{renderContent()}</div>
+      <UserSidebar />
+      <div className="user-content">
+        <Routes>
+          <Route path="/" element={<Navigate to="dashboard" replace />} />
+          <Route path="dashboard" element={<UserDashboard />} />
+          <Route path="catalog" element={<SeedCatalog />} />
+          <Route path="purchases" element={<PurchaseHistory />} />
+          <Route path="profile" element={<UserProfile />} />
+        </Routes>
+      </div>
     </div>
   );
 };

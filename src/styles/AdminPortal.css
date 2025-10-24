@@ -1,14 +1,16 @@
 .admin-portal {
   display: flex;
   margin-top: 80px;
+  background: linear-gradient(135deg, #1e3c72, #2a5298);
+  min-height: calc(100vh - 80px);
 }
 
 .admin-content {
-  margin-left: 250px;
+  margin-left: 70px;
   padding: 30px;
-  background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #1e3c72, #2a5298);
   min-height: calc(100vh - 80px);
-  width: 100%;
+  width: calc(100% - 70px);
   transition: all 0.3s ease;
 }
 

@@ -32,8 +32,8 @@ const PortalNavigation = () => {
         </div>
         
         <div className="nav-portals">
-          {/* Only show Admin Portal button if user has admin role */}
-          {(userRole === 'Admin' || userRole === 'SuperAdmin') && (
+          {/* Only show Admin Portal button if user has admin role and not currently in admin portal */}
+          {(userRole === 'Admin' || userRole === 'SuperAdmin') && !isAdminPortal && (
             <button
               className={`nav-portal-btn ${isAdminPortal ? 'active' : ''}`}
               onClick={() => handlePortalSwitch('admin')}
@@ -43,13 +43,16 @@ const PortalNavigation = () => {
             </button>
           )}
           
-          <button
-            className={`nav-portal-btn ${isUserPortal ? 'active' : ''}`}
-            onClick={() => handlePortalSwitch('user')}
-          >
-            <span className="portal-icon">👤</span>
-            <span className="portal-label">User Portal</span>
-          </button>
+          {/* Only show User Portal button if not currently in user portal */}
+          {!isUserPortal && (
+            <button
+              className={`nav-portal-btn ${isUserPortal ? 'active' : ''}`}
+              onClick={() => handlePortalSwitch('user')}
+            >
+              <span className="portal-icon">👤</span>
+              <span className="portal-label">User Portal</span>
+            </button>
+          )}
 
           <button
             className="nav-portal-btn logout-button"
