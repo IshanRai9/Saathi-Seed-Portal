@@ -26,7 +26,7 @@ const Login = () => {
   const handleConnectWallet = async () => {
     setConnecting(true);
     setLoginError(null);
-    
+
     try {
       await withErrorHandling(
         async () => {
@@ -44,7 +44,7 @@ const Login = () => {
       setConnecting(false);
     }
   };
-  
+
   const handleRoleChange = (event) => {
     setSelectedRole(event.target.value);
   };
@@ -53,23 +53,29 @@ const Login = () => {
     <div className="login-container">
       <div className="login-card">
         <div className="login-header">
-          <h1>🌱 Saathi Seed Portal</h1>
-          <p>Connect your wallet to access the portal</p>
+          <div className="logo-section">
+            <img src="/logo-hindi.png" alt="Government Logo" className="gov-logo" />
+            <div className="header-text">
+              <h1>Saathi Seed Portal</h1>
+              <p className="subtitle">सरकारी बीज ट्रेसेबिलिटी पोर्टल</p>
+              <p className="tagline">Government Seed Traceability & Management System</p>
+            </div>
+          </div>
         </div>
-        
+
         <div className="login-content">
           {error && (
             <div className="error-message">
               <p>{error}</p>
             </div>
           )}
-          
+
           {loginError && (
             <div className="error-message">
               <p>{loginError}</p>
             </div>
           )}
-          
+
           <div className="role-selection">
             <p>Select your role:</p>
             <div className="role-options">
@@ -95,26 +101,27 @@ const Login = () => {
               </label>
             </div>
           </div>
-          
-          <button 
-            className="connect-wallet-btn" 
+
+          <button
+            className="connect-wallet-btn"
             onClick={handleConnectWallet}
             disabled={connecting || loading}
           >
             {connecting ? 'Connecting...' : `Connect as ${selectedRole === 'admin' ? 'Admin' : 'User'}`}
           </button>
-          
+
           <div className="login-info">
-            <h3>About Saathi Seed Portal</h3>
-            <p>
-              Saathi Seed Portal is a blockchain-based seed traceability and inventory 
-              management system that ensures transparency in seed movement throughout 
-              the agricultural supply chain.
-            </p>
-            <p>
-              To use this application, you need a Web3 wallet like MetaMask installed 
-              in your browser.
-            </p>
+            <div className="info-section">
+              <h3>🔐 Secure Access</h3>
+              <p>This portal uses blockchain technology to ensure secure and transparent seed traceability.</p>
+            </div>
+            <div className="info-section">
+              <h3>📋 Requirements</h3>
+              <p>A Web3 wallet (MetaMask) is required for authentication and secure access.</p>
+            </div>
+            <div className="footer-text">
+              <p>© Government of India | Ministry of Agriculture & Farmers Welfare</p>
+            </div>
           </div>
         </div>
       </div>
